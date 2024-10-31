@@ -50,8 +50,8 @@ export default function BoardsPage() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['likes', pageLimit],
-    queryFn: ({ pageParam }) => getArticlesByLike(pageParam, pageLimit),
+    queryKey: ['likes', pageLimit, user?.id],
+    queryFn: ({ pageParam }) => getArticlesByLike(pageParam, pageLimit, String(user?.id)),
     enabled: !!pageLimit,
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
@@ -76,8 +76,8 @@ export default function BoardsPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['articles', selectedOption, searchValue, currentPage],
-    queryFn: () => getArticles({ selectedOption, searchValue, currentPage }),
+    queryKey: ['articles', selectedOption, searchValue, currentPage, user?.id],
+    queryFn: () => getArticles({ selectedOption, searchValue, currentPage, userId: user?.id }),
     placeholderData: keepPreviousData,
   })
 

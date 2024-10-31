@@ -38,7 +38,7 @@ export default function BoardDetailPage() {
   // useRouter 가 클라이언트 사이드에서만 제대로 작동하기 때문에 준비가 완료되었을 때 호출하기 위해 enabled 사용
   const { data: articleDetailData } = useQuery({
     queryKey: ['articleDetail', id],
-    queryFn: () => getArticleDetail(id),
+    queryFn: () => getArticleDetail(id, String(user?.id)),
     enabled: !!id,
   })
 

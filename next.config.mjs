@@ -24,9 +24,8 @@ const nextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'http',
-        hostname: 'rave-dev.ddns.net',
-        pathname: '/**',
+        source: '/api/:path*',
+        destination: 'http://rave-dev.ddns.net:8080/:path*',
       },
     ],
   },
