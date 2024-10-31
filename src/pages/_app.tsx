@@ -20,10 +20,10 @@ const queryClient = new QueryClient({
     },
   },
 })
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare global {
   interface Window {
-    Kakao: { init: (apiKey: string) => void; isInitialized: () => boolean }
+    Kakao: any
   }
 }
 
