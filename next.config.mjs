@@ -23,11 +23,15 @@ const nextConfig = {
         hostname: 'search.pstatic.net',
         pathname: '/**',
       },
+    ],
+  },
+  async rewrites() {
+    return [
       {
         source: '/api/:path*',
         destination: 'http://rave-dev.ddns.net:8080/:path*',
       },
-    ],
+    ]
   },
 }
 
