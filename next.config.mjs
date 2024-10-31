@@ -23,6 +23,11 @@ const nextConfig = {
         hostname: 'search.pstatic.net',
         pathname: '/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'rave-dev.ddns.net',
+        pathname: '/**',
+      },
     ],
   },
   async rewrites() {
