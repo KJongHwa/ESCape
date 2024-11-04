@@ -9,13 +9,18 @@ import { useToaster } from '@/contexts/ToasterProvider'
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import axios from '@/libs/axios/axiosInstance'
 
+interface updateMeParams {
+  description?: string
+  image?: string
+  nickname?: string
+}
 interface AuthValues {
   user: CommonUserTypes | null
   isPending: boolean
   login: (formData: SignInForm) => Promise<boolean | { success: boolean; message: string }>
   logout: () => void
-  updateMe: () => void
-  oAuthLogin: (formData: OAuthSignInForm, provider: OAuthProviders) => Promise<SignInReturn | null>
+  updateMe: (updatedInfo: updateMeParams) => void
+  oAuthLogin: (formData: OAuthSignInForm, provider: OAuthProviders) => Promise<SignInReturn>
 }
 
 type UserValue = CommonUserTypes | null
@@ -64,13 +69,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (formData: SignInForm): Promise<boolean | { success: boolean; message: string }> => {
-      const isSignInSuccess = await signIn(formData)
-      if (!isSignInSuccess) {
-        return { success: false, message: '이메일 혹은 비밀번호를 확인해주세요.' }
+      try {
+        await signIn(formData)
+        toaster('success', '로그인에 성공하였습니다.')
+        await getMe()
+        return true
+      } catch {
+        return false
       }
-      toaster('success', '로그인에 성공하였습니다.')
-      await getMe()
-      return true
     },
     [getMe, toaster],
   )
@@ -78,7 +84,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const oAuthLogin = useCallback(
     async (formData: OAuthSignInForm, provider: OAuthProviders) => {
       const user = await oAuthSignIn(formData, provider)
-      if (!user) return user
       toaster('success', '로그인에 성공하였습니다.')
       await getMe()
       return user
@@ -92,16 +97,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     toaster('success', '로그아웃이 되었습니다.')
   }, [toaster])
 
-  async function updateMe(user: CommonUserTypes) {
-    try {
-      const res = await axios.patch('/users/me', user)
-      const nextUser = res.data
-      handleAuthChange('user', nextUser)
-    } catch (error) {
-      console.error('사용자 정보 업데이트에 실패했습니다:', error)
-      toaster('warn', '사용자 정보 업데이트에 실패했습니다.')
-    }
-  }
+  const updateMe = useCallback(
+    async (updatedInfo: updateMeParams) => {
+      const user = {
+        description: updatedInfo.description || authState.user?.description,
+        nickname: updatedInfo.nickname || authState.user?.nickname,
+        image: updatedInfo.image || authState.user?.image,
+      }
+      try {
+        const res = await axios.patch('/users/me', user)
+        const nextUser = res.data
+        handleAuthChange('user', nextUser)
+      } catch (error) {
+        console.error('사용자 정보 업데이트에 실패했습니다:', error)
+        toaster('warn', '사용자 정보 업데이트에 실패했습니다.')
+      }
+    },
+    [toaster, authState.user?.description, authState.user?.image, authState.user?.nickname],
+  )
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken')

@@ -63,7 +63,7 @@ export default function KakaoSignupPage() {
     }
 
     handleOauthCallback()
-  }, [router, saveTokens])
+  }, [router, oAuthLogin, updateMe])
 
   return (
     <div>

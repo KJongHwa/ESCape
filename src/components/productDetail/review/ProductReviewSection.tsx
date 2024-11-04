@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAuth } from '@/contexts/AuthProvider'
 import { useToaster } from '@/contexts/ToasterProvider'
@@ -13,19 +12,18 @@ import SortDropdown from './SortDropdown'
 import StarRating from '../StarRating'
 import ReviewLikeButton from './ReviewLikeButton'
 import ReviewModal from '../ReviewModal'
-import ConfirmModal from '../ConfirmModal' // Import ConfirmModal here
+import ConfirmModal from '../ConfirmModal'
 
 interface ProductReviewSectionProps {
   productId: number
-  sortOption: 'recent' | 'ratingDesc' | 'ratingAsc' | 'likeCount' | null
-  onSortChange: (newSortOption: 'recent' | 'ratingDesc' | 'ratingAsc' | 'likeCount' | null) => void
+  sortOption: 'recent' | 'ratingDesc' | 'ratingAsc' | 'likeCount'
+  onSortChange: (newSortOption: 'recent' | 'ratingDesc' | 'ratingAsc' | 'likeCount') => void
 }
 
 const ProductReviewSection: React.FC<ProductReviewSectionProps> = ({ productId, sortOption, onSortChange }) => {
   const router = useRouter()
   const toaster = useToaster()
   const { user } = useAuth()
-  const queryClient = useQueryClient()
   const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false)
   const [editingReview, setEditingReview] = useState<ProductReviewListTypes | null>(null)
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
@@ -36,8 +34,10 @@ const ProductReviewSection: React.FC<ProductReviewSectionProps> = ({ productId, 
     order: sortOption,
   })
 
-  // SortDropdown에 전달하기 전에 기본값 설정
-  const validSortOption = sortOption ?? 'recent'
+  // sortOption 변경 시 refetch 호출
+  useEffect(() => {
+    refetch()
+  }, [sortOption, refetch])
 
   // useInfiniteScroll 훅으로 스크롤 이벤트 관리
   const { targetRef } = useInfiniteScroll({
@@ -56,7 +56,7 @@ const ProductReviewSection: React.FC<ProductReviewSectionProps> = ({ productId, 
 
   const handleDeleteReview = (reviewId: number) => {
     setReviewIdToDelete(reviewId)
-    setShowConfirmModal(true) // ConfirmModal 표시
+    setShowConfirmModal(true)
   }
 
   const confirmDelete = async () => {
@@ -64,9 +64,7 @@ const ProductReviewSection: React.FC<ProductReviewSectionProps> = ({ productId, 
       try {
         await deleteReview(reviewIdToDelete)
         toaster('success', '리뷰가 성공적으로 삭제되었습니다.')
-        await queryClient.invalidateQueries({ queryKey: ['reviews', productId, sortOption] })
-        await queryClient.invalidateQueries({ queryKey: ['productDetail', productId] })
-        refetch() // 서버에서 데이터 즉각적으로 다시 불러오기
+        refetch()
       } catch (error) {
         console.error('리뷰 삭제 실패:', error)
         toaster('fail', '리뷰 삭제에 실패했습니다.')
@@ -85,8 +83,6 @@ const ProductReviewSection: React.FC<ProductReviewSectionProps> = ({ productId, 
   const closeModal = () => {
     setIsReviewModalOpen(false)
     setEditingReview(null)
-    queryClient.invalidateQueries({ queryKey: ['reviews', productId, sortOption] })
-    queryClient.invalidateQueries({ queryKey: ['productDetail', productId] })
     refetch()
   }
 
@@ -94,7 +90,7 @@ const ProductReviewSection: React.FC<ProductReviewSectionProps> = ({ productId, 
     <div className="relative mx-auto max-w-[940px]">
       <div className="mb-[30px] flex items-center justify-between">
         <h3 className="text-lg font-semibold">상품 리뷰</h3>
-        <SortDropdown order={onSortChange} currentSortOption={validSortOption} />
+        <SortDropdown order={onSortChange} currentSortOption={sortOption} />
       </div>
 
       {data?.pages && data.pages.length === 0 ? (

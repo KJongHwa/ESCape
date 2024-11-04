@@ -39,13 +39,13 @@ export default function SignInPage() {
     setLoading(true)
     try {
       const response = await login(data)
-      const { success, message } = response
-      if (!success) {
+      if (!response) {
+        const message = '이메일 혹은 비밀번호를 확인해주세요.'
         setLoginErrorMessage(message)
       } else {
         router.push('/product')
       }
-    } catch (error) {
+    } catch {
       setLoginErrorMessage('로그인 중 오류가 발생했습니다. 다시 시도해 주세요.')
     } finally {
       setLoading(false)

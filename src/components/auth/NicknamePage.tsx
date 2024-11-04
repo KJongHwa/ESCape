@@ -25,13 +25,12 @@ export default function NicknamePage() {
     const formData = {
       nickname: data.nickname,
       redirectUri: `http://localhost:3000/oauth/${provider}`, // 리다이렉트 URI
-      token,
+      token: token as string,
     }
 
     setLoading(true)
-
     try {
-      const isSignUpSuccess = await oAuthSignUp(formData, provider)
+      const isSignUpSuccess = await oAuthSignUp(formData, provider as 'google' | 'kakao')
       if (isSignUpSuccess) {
         router.push('/product')
       }

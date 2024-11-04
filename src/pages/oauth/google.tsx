@@ -94,7 +94,7 @@ export default function GoogleOauth() {
     }
 
     handleOauthCallback()
-  }, [router, saveTokens])
+  }, [router, oAuthLogin, updateMe])
 
   return (
     <div>

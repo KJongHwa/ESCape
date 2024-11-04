@@ -83,7 +83,7 @@ export default function Profile({ data: userData, refetchUserInfo = () => {} }: 
 
   const uploadNewProfileMutation = useMutation({
     mutationFn: async (newProfile: UpdateMyInfoParams) => {
-      await Promise.all([
+      const response = await Promise.all([
         updateMyInfo(newProfile),
         patchUsers({
           id: Number(myInfo?.id),
@@ -92,9 +92,10 @@ export default function Profile({ data: userData, refetchUserInfo = () => {} }: 
           image: newProfile.image,
         }),
       ])
+      return response[0]
     },
     onSuccess: data => {
-      updateMe(data)
+      updateMe({ nickname: data.nickname, description: data.description, image: data.image as string })
       queryClient.invalidateQueries({ queryKey: ['myInfo'] })
       toggleEditProfileModal()
     },
