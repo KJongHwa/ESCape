@@ -27,7 +27,7 @@ export interface SignUpForm {
 }
 
 export interface SignInReturn {
-  accessToken: string
+  accessToken: any
   user: {
     id: number
     email: string

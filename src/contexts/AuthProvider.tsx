@@ -7,12 +7,14 @@ import { useRouter } from 'next/router'
 import getUser from '@/libs/axios/user/getUser'
 import { useToaster } from '@/contexts/ToasterProvider'
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import axios from '@/libs/axios/axiosInstance'
 
 interface AuthValues {
   user: CommonUserTypes | null
   isPending: boolean
   login: (formData: SignInForm) => Promise<boolean | { success: boolean; message: string }>
   logout: () => void
+  updateMe: () => void
   oAuthLogin: (formData: OAuthSignInForm, provider: OAuthProviders) => Promise<SignInReturn | null>
 }
 
@@ -23,6 +25,7 @@ const INITIAL_CONTEXT_VALUES: AuthValues = {
   isPending: true,
   login: () => Promise.reject(),
   logout: () => {},
+  updateMe: () => {},
   oAuthLogin: () => Promise.reject(),
 }
 
@@ -76,10 +79,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (formData: OAuthSignInForm, provider: OAuthProviders) => {
       const user = await oAuthSignIn(formData, provider)
       if (!user) return user
+      toaster('success', '로그인에 성공하였습니다.')
       await getMe()
       return user
     },
-    [getMe],
+    [getMe, toaster],
   )
 
   const logout = useCallback(() => {
@@ -87,6 +91,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     removeTokens()
     toaster('success', '로그아웃이 되었습니다.')
   }, [toaster])
+
+  async function updateMe(user: CommonUserTypes) {
+    try {
+      const res = await axios.patch('/users/me', user)
+      const nextUser = res.data
+      handleAuthChange('user', nextUser)
+    } catch (error) {
+      console.error('사용자 정보 업데이트에 실패했습니다:', error)
+      toaster('warn', '사용자 정보 업데이트에 실패했습니다.')
+    }
+  }
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken')
@@ -104,8 +119,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       logout,
       oAuthLogin,
+      updateMe,
     }),
-    [authState.user, authState.isPending, login, logout, oAuthLogin],
+    [authState.user, authState.isPending, login, logout, oAuthLogin, updateMe],
   )
 
   return <AuthContext.Provider value={providerValueProp}>{children}</AuthContext.Provider>
