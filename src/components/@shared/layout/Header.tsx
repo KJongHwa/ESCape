@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { ChangeEvent, FormEvent, PropsWithChildren, useState, useEffect } from 'react'
+import { ChangeEvent, FormEvent, PropsWithChildren, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import iconHamburger from '@icons/icon_hamburger.svg'
