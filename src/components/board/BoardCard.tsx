@@ -103,7 +103,7 @@ export default function BoardCard({ article, userId, reFetch }: BoardCardProps) 
           <div className="flex items-center gap-3">
             <Image
               className="h-8 w-8 rounded-full"
-              src={article.writer.image === 'string' || 'null' ? ProfileIcon : article.writer.image}
+              src={article.writer.image === 'null' ? ProfileIcon : article.writer.image}
               alt="작성자 이미지"
               width={32}
               height={32}
