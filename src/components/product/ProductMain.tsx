@@ -1,7 +1,6 @@
 import useProducts from '@/hooks/useProducts'
 import useInfiniteProducts from '@/hooks/useInfiniteProduct'
 import useInfiniteScroll from '@/hooks/useInfiniteScroll'
-import { InitialDataType } from '@/pages/product'
 import useRouteHandler from '@/hooks/useRouteHandler'
 import { CATEGORY_DATA } from '@/libs/constants/category'
 import { match } from 'ts-pattern'
@@ -29,14 +28,10 @@ const DROPDOWN_VALUE: DropDownValues<DropDownValueType>[] = [
   },
 ]
 
-interface ProductMainProps {
-  initialData: InitialDataType
-}
-
-export default function ProductMain({ initialData }: ProductMainProps) {
+export default function ProductMain() {
   const { keyword, order, category, handleOrder } = useRouteHandler()
-  const { data: reviewCountData } = useProducts({ order: 'reviewCount' }, initialData.responseReviewCountData)
-  const { data: ratingData } = useProducts({ order: 'rating' }, initialData.responseRatingData)
+  const { data: reviewCountData } = useProducts({ order: 'reviewCount' })
+  const { data: ratingData } = useProducts({ order: 'rating' })
   const { data: productData, fetchNextPage } = useInfiniteProducts({
     keyword: (keyword as string) || null,
     order: (order as 'rating' | 'recent' | 'reviewCount') || null,

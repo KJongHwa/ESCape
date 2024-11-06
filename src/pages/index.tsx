@@ -9,6 +9,8 @@ import image4 from '@images/mainimage4.png'
 import logoSmall from '@images/logo_small.svg'
 import { useRouter } from 'next/router'
 import { PiCaretDoubleDownBold } from 'react-icons/pi'
+import CustomButton from '@/components/@shared/ui/CustomButton'
+import Link from 'next/link'
 
 export default function HomePage() {
   const router = useRouter()
@@ -70,15 +72,17 @@ export default function HomePage() {
             repeat: Infinity,
             repeatType: 'loop',
           }}
-          className="flex flex-col items-center gap-4 text-3xl font-bold"
+          className="flex flex-col items-center gap-4 text-xl font-bold xl:text-3xl"
         >
           <span>함께 만드는 방탈출 커뮤니티</span>
-          <Image src={logoText} alt="로고" width={300} height={50} />
+          <div className="relative h-[35px] w-[200px] xl:h-[50px] xl:w-[300px]">
+            <Image src={logoText} alt="로고" fill />
+          </div>
         </motion.div>
-        <motion.div ref={scrollTargetRef} className="scroll-hidden flex snap-x gap-[50px] px-[100px] pt-5">
+        <motion.div ref={scrollTargetRef} className="scroll-hidden flex snap-x gap-[100px] px-[100px] pt-5">
           {imagesArr.map(image => (
             <div
-              className="relative flex h-[400px] shrink-0 snap-center flex-col items-center justify-between gap-10"
+              className="xL:h-[40px] relative flex h-[350px] shrink-0 snap-center flex-col items-center justify-between xl:h-[400px] xl:gap-10"
               key={image.key}
             >
               <motion.div
@@ -94,13 +98,18 @@ export default function HomePage() {
                 initial={{ left: 100, opacity: 0, scale: 0.5 }}
                 transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
                 whileInView={{ opacity: 1, scale: 1, left: 0 }}
-                className="relative text-xl font-bold text-brand-gray-light"
+                className="relative text-lg font-bold text-brand-gray-light xl:text-xl"
               >
                 {image.text}
               </motion.span>
             </div>
           ))}
         </motion.div>
+        <div className="pt-5 xl:hidden">
+          <CustomButton active>
+            <Link href="product">테마 보러가기</Link>
+          </CustomButton>
+        </div>
       </div>
       <motion.div
         animate={{ opacity: [0.5, 0.1, 0.5] }}
@@ -110,10 +119,14 @@ export default function HomePage() {
           repeatType: 'loop',
         }}
       >
-        <PiCaretDoubleDownBold className="absolute bottom-[30px] left-1/2 h-[100px] w-[100px] -translate-x-1/2" />
+        <div className="absolute bottom-[30px] left-1/2 hidden -translate-x-1/2 flex-col items-center xl:flex">
+          <PiCaretDoubleDownBold className="h-[100px] w-[100px]" />
+          <span className="text-lg">스크롤을 내려 입장</span>
+        </div>
       </motion.div>
+
       <motion.div
-        className="absolute left-1/2 top-1/2 z-20 -mt-[100px] -translate-x-1/2 -translate-y-1/2 transform overflow-hidden rounded-full"
+        className="absolute left-1/2 top-1/2 z-20 -mt-[100px] -translate-x-1/2 transform overflow-hidden rounded-full"
         initial={{ scale: 1, opacity: 0.3 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
         animate={{ scale: growLogoSize, opacity: 0.3 + growLogoSize / 20 }}
